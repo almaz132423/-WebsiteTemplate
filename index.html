@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#17211d">
+  <meta name="description" content="Информация об услугах и отправка заявки.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Сайт компании">
+  <meta property="og:description" content="Услуги и контакты компании">
+  <title>Сайт компании</title>
+  <link rel="stylesheet" href="./css/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" defer></script>
+  <script src="./js/main.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Перейти к содержимому</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#home" aria-label="На главную"><span class="brand-mark" aria-hidden="true">●</span><span id="brand-name">Название компании</span></a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav"><span class="sr-only">Открыть меню</span><span></span><span></span></button>
+      <nav class="main-nav" id="main-nav" aria-label="Основная навигация">
+        <a href="#services">Услуги</a><a href="#about">О компании</a><a href="#contacts">Контакты</a>
+      </nav>
+      <div class="header-contact"><a id="header-phone" href="#contacts">Связаться</a><button class="button button-small" type="button" data-open-booking>Оставить заявку</button></div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero section" id="home">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="eyebrow-line"></span><span id="hero-eyebrow">Услуги для вас</span></p>
+          <h1 id="hero-title">Качество, которому можно <em>доверять.</em></h1>
+          <p class="hero-description" id="hero-description">Расскажите о своей компании, услугах и подходе к работе в конфигурации сайта.</p>
+          <div class="hero-actions"><a class="button" href="#services">Посмотреть услуги <span aria-hidden="true">↗</span></a><button class="button button-quiet" type="button" data-open-booking>Оставить заявку</button></div>
+          <div class="hero-note"><span class="note-dot"></span><span id="hero-note">Свяжитесь с нами, чтобы обсудить детали</span></div>
+        </div>
+        <div class="hero-visual" aria-label="Изображение компании">
+          <div class="hero-image" id="hero-image" role="img" aria-label="Тематическое изображение компании"></div>
+          <div class="image-caption"><span class="caption-number">01 /</span><span id="hero-image-caption">Ваш бизнес. Ваш подход.</span></div>
+          <div class="hero-stamp" aria-hidden="true"><span>ВАШ</span><span>БИЗНЕС</span><span class="stamp-arrow">↗</span></div>
+        </div>
+      </div>
+      <div class="container hero-bottom"><span>01 — УСЛУГИ</span><span>02 — ПОДХОД</span><span>03 — КОНТАКТЫ</span><span class="scroll-hint">ЛИСТАЙТЕ ВНИЗ ↓</span></div>
+    </section>
+
+    <section class="section services-section" id="services">
+      <div class="container">
+        <div class="section-heading">
+          <div><p class="eyebrow"><span class="eyebrow-line"></span>ЧТО МЫ ПРЕДЛАГАЕМ</p><h2 id="services-title">Услуги <em>и решения</em></h2></div>
+          <p id="services-intro">Выберите подходящую услугу и отправьте заявку — мы свяжемся с вами для уточнения деталей.</p>
+        </div>
+        <div class="services-grid" id="services-list" aria-live="polite"><p class="loading-state">Загружаем услуги…</p></div>
+      </div>
+    </section>
+
+    <section class="section about-section" id="about">
+      <div class="container about-grid">
+        <div class="about-aside"><p class="eyebrow"><span class="eyebrow-line"></span>О КОМПАНИИ</p><span class="about-index">02<span> / О НАС</span></span></div>
+        <div class="about-content"><h2 id="about-title">Внимание к деталям.<br><em>Понятный подход.</em></h2><p class="about-description" id="about-description">Здесь разместите краткую и достоверную информацию о компании, опыте и принципах работы.</p><div class="about-points" id="about-points"></div></div>
+      </div>
+    </section>
+
+    <section class="section contact-section" id="contacts">
+      <div class="container contact-grid">
+        <div class="contact-intro"><p class="eyebrow"><span class="eyebrow-line"></span>СЛЕДУЮЩИЙ ШАГ</p><h2>Обсудим<br><em>вашу задачу?</em></h2><p id="contact-intro">Выберите услугу и отправьте заявку удобным способом.</p><button class="button" type="button" data-open-booking>Оставить заявку <span aria-hidden="true">↗</span></button></div>
+        <div class="contact-details">
+          <div class="contact-row"><span class="contact-label">ТЕЛЕФОН</span><a id="contact-phone" href="#contacts">Укажите телефон</a></div>
+          <div class="contact-row"><span class="contact-label">АДРЕС</span><p id="contact-address">Укажите адрес компании</p></div>
+          <div class="contact-row"><span class="contact-label">ЧАСЫ РАБОТЫ</span><p id="contact-hours">Укажите график работы</p></div>
+          <div class="contact-row"><span class="contact-label">МЕССЕНДЖЕРЫ</span><div class="contact-messengers" id="contact-messengers"></div></div>
+          <a class="route-link" id="route-link" href="#contacts" hidden target="_blank" rel="noopener noreferrer">Построить маршрут ↗</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer"><div class="container footer-inner"><a class="brand footer-brand" href="#home"><span class="brand-mark" aria-hidden="true">●</span><span id="footer-name">Название компании</span></a><p id="footer-description">Информация о компании</p><div class="footer-bottom"><span>© <span id="current-year"></span> <span id="footer-company">Название компании</span></span><a href="#home">Наверх ↑</a><a href="./admin.html">Редактор конфигурации</a></div></div></footer>
+
+  <dialog class="booking-dialog" id="booking-dialog" aria-labelledby="booking-title">
+    <div class="dialog-shell">
+      <div class="dialog-top"><p class="eyebrow"><span class="eyebrow-line"></span>ЗАЯВКА</p><button class="dialog-close" type="button" aria-label="Закрыть окно">×</button></div>
+      <h2 id="booking-title">Давайте <em>обсудим детали.</em></h2>
+      <p class="dialog-description">Заполните форму. Перед переходом в мессенджер вы сможете проверить и отредактировать сообщение.</p>
+      <form id="booking-form" novalidate>
+        <div class="selected-service"><span>ВЫБРАННАЯ УСЛУГА</span><strong id="selected-service-name">Не выбрана</strong><button type="button" id="change-service" class="text-button">Изменить</button></div>
+        <div class="form-fields" id="form-fields"></div>
+        <p class="form-error" id="form-error" role="alert" hidden></p>
+        <button class="button button-full" type="submit">Подготовить заявку <span aria-hidden="true">↗</span></button>
+      </form>
+      <section class="message-preview" id="message-preview" hidden aria-labelledby="preview-title">
+        <div class="preview-heading"><p class="eyebrow">ПРОВЕРЬТЕ ТЕКСТ</p><h3 id="preview-title">Сообщение заявки</h3></div>
+        <label class="field-label" for="message-text">Сообщение можно отредактировать</label>
+        <textarea id="message-text" rows="8"></textarea>
+        <div class="preview-actions"><button class="button button-outline" id="copy-message" type="button">Скопировать текст</button><span class="copy-status" id="copy-status" role="status"></span></div>
+        <p class="messenger-instructions" id="messenger-instructions">Выберите мессенджер. Если текст не подставился автоматически, вставьте скопированное сообщение вручную.</p>
+        <div class="messenger-actions" id="messenger-actions"></div>
+        <button class="text-button back-to-form" id="back-to-form" type="button">← Вернуться к форме</button>
+      </section>
+      <p class="dialog-footnote">Отправка заявки не подтверждает запись. Компания должна отдельно подтвердить возможность обслуживания.</p>
+    </div>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
