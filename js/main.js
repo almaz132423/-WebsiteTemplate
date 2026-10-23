@@ -289,22 +289,74 @@
   $$("#main-nav a").forEach(link => link.addEventListener("click", () => {
     $("#main-nav").classList.remove("is-open"); menuToggle.setAttribute("aria-expanded", "false"); $(".menu-toggle .sr-only").textContent = "Открыть меню";
   }));
-  const init = async () => {
+  const parseCsv = (text) => {
+    const rows = []; let row = [], cell = "", quoted = false;
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      if (quoted) { if (ch === '"' && text[i + 1] === '"') { cell += '"'; i++; } else if (ch === '"') quoted = false; else cell += ch; }
+      else if (ch === '"' && cell === "") quoted = true;
+      else if (ch === ",") { row.push(cell); cell = ""; }
+      else if (ch === "\n") { row.push(cell); rows.push(row); row = []; cell = ""; }
+      else if (ch !== "\r") cell += ch;
+    }
+    if (cell.length || row.length) { row.push(cell); rows.push(row); }
+    const headers = (rows.shift() || []).map(value => value.trim().replace(/^\uFEFF/, ""));
+    return rows.filter(values => values.some(value => value.trim() !== "")).map(values => Object.fromEntries(headers.map((header, index) => [header, (values[index] || "").trim()])));
+  };
+  const fetchCsv = async (url) => {
+    if (typeof url !== "string" || !url.trim()) return [];
+    const response = await fetch(url + (url.includes("?") ? "&" : "?") + "_siteRefresh=" + Date.now(), { cache: "no-store" });
+    if (!response.ok) throw new Error("Не удалось загрузить опубликованную таблицу");
+    return parseCsv(await response.text());
+  };
+  const applyLiveSettings = (config, rows) => {
+    const targets = {
+      "business.name":["business","name"], "business.type":["business","type"], "business.description":["business","description"],
+      "business.heroTitle":["business","heroTitle"], "business.heroDescription":["business","heroDescription"], "business.heroNote":["business","heroNote"],
+      "business.heroImage":["business","heroImage"], "business.heroImageAlt":["business","heroImageAlt"], "business.heroImageCaption":["business","heroImageCaption"],
+      "business.aboutTitle":["business","aboutTitle"], "business.aboutDescription":["business","aboutDescription"],
+      "contacts.phone":["contacts","phone"], "contacts.address":["contacts","address"], "contacts.hours":["contacts","hours"], "contacts.routeUrl":["contacts","routeUrl"],
+      "messengers.whatsapp.phone":["messengers","whatsapp","phone"], "messengers.telegram.url":["messengers","telegram","url"], "messengers.max.url":["messengers","max","url"],
+      "booking.intro":["booking","intro"], "seo.title":["seo","title"], "seo.description":["seo","description"], "seo.ogTitle":["seo","ogTitle"], "seo.ogDescription":["seo","ogDescription"]
+    };
+    rows.forEach(row => {
+      const key = row.key || row.field || "", value = row.value ?? "";
+      if (key === "business.aboutPoints") { config.business.aboutPoints = value ? value.split("|").map(item => item.trim()).filter(Boolean) : []; return; }
+      const path = targets[key]; if (!path) return;
+      let node = config;
+      for (let i = 0; i < path.length - 1; i++) { if (!node[path[i]] || typeof node[path[i]] !== "object") node[path[i]] = {}; node = node[path[i]]; }
+      node[path[path.length - 1]] = value;
+    });
+  };
+  const loadLiveConfig = async (config) => {
+    const live = config.liveData || {}, tasks = [];
+    if (live.settingsCsvUrl) tasks.push(fetchCsv(live.settingsCsvUrl).then(rows => applyLiveSettings(config, rows)));
+    if (live.servicesCsvUrl) tasks.push(fetchCsv(live.servicesCsvUrl).then(rows => {
+      config.services = rows.map((row, index) => ({ id:row.id || "service-" + (index + 1), name:row.name || "", description:row.description || "", price:row.price || "", duration:row.duration || "", image:row.image || "", imageAlt:row.imageAlt || "" })).filter(service => service.name);
+    }));
+    const results = await Promise.allSettled(tasks);
+    results.forEach(result => { if (result.status === "rejected") console.warn("Live-таблица не загрузилась; используются данные из business.json.", result.reason); });
+    return config;
+  };
+  const refreshLiveConfig = async () => {
     try {
-      const response = await fetch("./config/business.json");
+      const response = await fetch("./config/business.json", { cache: "no-store" });
       if (!response.ok) throw new Error("Не удалось загрузить config/business.json");
-      state.config = await response.json();
-      setTheme(state.config.theme);
-      setContent(state.config);
-      renderServices();
-      if (window.anime && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        window.anime({ targets: ".hero-copy > *, .hero-visual", translateY: [16, 0], opacity: [0, 1], delay: window.anime.stagger(90), duration: 650, easing: "easeOutCubic" });
-      }
+      const config = await response.json(); await loadLiveConfig(config);
+      state.config = config; setTheme(config.theme); setContent(config); renderServices();
     } catch (error) {
       console.error(error);
-      $("#services-list").innerHTML = '<p class="empty-state">Не удалось загрузить конфигурацию. Запустите сайт через локальный веб-сервер и проверьте файл config/business.json.</p>';
-      showToast("Ошибка загрузки конфигурации сайта.");
+      if (!state.config) { $("#services-list").innerHTML = '<p class="empty-state">Не удалось загрузить конфигурацию. Проверьте доступность config/business.json.</p>'; showToast("Ошибка загрузки конфигурации сайта."); }
+    }
+  };
+  const init = async () => {
+    await refreshLiveConfig();
+    if (window.anime && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      window.anime({ targets: ".hero-copy > *, .hero-visual", translateY: [16, 0], opacity: [0, 1], delay: window.anime.stagger(90), duration: 650, easing: "easeOutCubic" });
     }
   };
   init();
+  // Обновляем данные без публикации сайта, пока вкладка открыта.
+  window.setInterval(() => { if (document.visibilityState === "visible") refreshLiveConfig(); }, 120000);
+  window.addEventListener("focus", refreshLiveConfig);
 })();
