@@ -153,7 +153,7 @@
   const getService = (id) => (state.config.services || []).find((service, index) => String(service.id || index) === String(id));
   const openBooking = (service = null) => {
     state.lastFocused = document.activeElement;
-    state.selectedService = service || state.selectedService || null;
+    state.selectedService = service || null;
     $("#selected-service-name").textContent = state.selectedService?.name || "Не выбрана";
     $("#change-service").hidden = !(state.config.services || []).length;
     form.hidden = false; preview.hidden = true; formError.hidden = true;
