@@ -118,6 +118,8 @@
     setValue("messenger-whatsapp", config.messengers.whatsapp?.phone);
     setValue("messenger-telegram", config.messengers.telegram?.url);
     setValue("messenger-max", config.messengers.max?.url);
+    setValue("sheets-csv-url", config.liveData?.csvUrl || "");
+    setValue("sheets-write-url", config.liveData?.writeUrl || "");
     renderServices();
     updatePreview();
   };
@@ -202,6 +204,55 @@
     readForm();
     $("#json-preview").textContent = JSON.stringify(config, null, 2);
   };
+  const configToSheetRows = () => {
+    updatePreview();
+    const rows = [["type","key","value","id","name","description","price","duration","image","imageAlt"]];
+    const add = (key, value) => rows.push(["settings", key, Array.isArray(value) ? value.join("|") : String(value ?? ""), "", "", "", "", "", "", ""]);
+    const b = config.business || {}, c = config.contacts || {}, m = config.messengers || {}, booking = config.booking || {}, seo = config.seo || {};
+    [
+      ["business.name",b.name],["business.type",b.type],["business.description",b.description],
+      ["business.heroTitle",b.heroTitle],["business.heroDescription",b.heroDescription],["business.heroNote",b.heroNote],
+      ["business.heroImage",b.heroImage],["business.heroImageAlt",b.heroImageAlt],["business.heroImageCaption",b.heroImageCaption],
+      ["business.aboutTitle",b.aboutTitle],["business.aboutDescription",b.aboutDescription],["business.aboutPoints",b.aboutPoints],
+      ["contacts.phone",c.phone],["contacts.address",c.address],["contacts.hours",c.hours],["contacts.routeUrl",c.routeUrl],
+      ["messengers.whatsapp.phone",m.whatsapp?.phone],["messengers.whatsapp.enabled",m.whatsapp?.enabled],
+      ["messengers.telegram.url",m.telegram?.url],["messengers.telegram.enabled",m.telegram?.enabled],
+      ["messengers.max.url",m.max?.url],["messengers.max.enabled",m.max?.enabled],
+      ["booking.intro",booking.intro],["seo.title",seo.title],["seo.description",seo.description],
+      ["seo.ogTitle",seo.ogTitle],["seo.ogDescription",seo.ogDescription]
+    ].forEach(([key,value]) => { if (value !== undefined && value !== null) add(key,value); });
+    (config.services || []).forEach((s,i) => rows.push(["service","","",s.id || "service-"+(i+1),s.name || "",s.description || "",s.price || "",s.duration || "",s.image || "",s.imageAlt || ""]));
+    return rows;
+  };
+  const saveToSheets = async () => {
+    updatePreview();
+    const endpoint = getValue("sheets-write-url");
+    const token = getValue("sheets-admin-token");
+    if (!endpoint || !/^https:\/\/script\.google\.com\/macros\/s\//i.test(endpoint)) {
+      status("Укажите URL опубликованного веб-приложения Google Apps Script.", true); return;
+    }
+    if (!token) { status("Введите секретный токен, настроенный в свойствах Google Apps Script.", true); return; }
+    const button = $("#save-to-sheets");
+    button.disabled = true;
+    status("Отправляю данные в Google Таблицу…");
+    try {
+      const payload = { token, rows: configToSheetRows() };
+      await fetch(endpoint, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+        body: new URLSearchParams({ payload: JSON.stringify(payload) }).toString()
+      });
+      config.liveData = config.liveData || {};
+      config.liveData.csvUrl = getValue("sheets-csv-url");
+      config.liveData.writeUrl = endpoint;
+      status("Запрос отправлен. Проверьте Google Таблицу: из-за ограничений браузера сайт не может прочитать ответ скрипта.");
+    } catch (error) {
+      status("Не удалось отправить данные: " + error.message, true);
+    } finally {
+      button.disabled = false;
+    }
+  };
   const exportConfig = () => {
     updatePreview();
     const blob = new Blob([JSON.stringify(config, null, 2) + "\n"], { type: "application/json;charset=utf-8" });
@@ -244,6 +295,7 @@
       updatePreview();
       status("Добавлена новая услуга. Заполните поля и экспортируйте JSON.");
     });
+    $("#save-to-sheets").addEventListener("click", saveToSheets);
     $("#export-config").addEventListener("click", exportConfig);
     $("#download-current").addEventListener("click", exportConfig);
     $("#import-config").addEventListener("change", event => {
