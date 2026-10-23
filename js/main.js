@@ -328,7 +328,9 @@
     try {
       const response = await fetch(url + (url.includes("?") ? "&" : "?") + "_siteRefresh=" + Date.now(), { cache: "no-store" });
       if (!response.ok) throw new Error("Не удалось загрузить опубликованную таблицу");
-      const rows = parseCsv(await response.text());
+      const csvText = await response.text();
+      const rows = parseCsv(csvText);
+      if (!rows.length || !("type" in rows[0]) || !("name" in rows[0]) || !("key" in rows[0])) throw new Error("CSV загружен, но заголовки не совпадают с шаблоном");
       applyLiveSettings(config, rows.filter(row => (row.type || "").toLowerCase() !== "service" && (row.key || row.field)));
       const services = rows.filter(row => (row.type || "").toLowerCase() === "service" || (!row.key && row.name));
       config.services = services.map((row, index) => ({
