@@ -96,7 +96,7 @@
   const renderServices = () => {
     const list = $("#services-list");
     const services = Array.isArray(state.config.services) ? state.config.services : [];
-    if (!services.length) { list.innerHTML = '<p class="empty-state">Добавьте услуги в config/business.json.</p>'; return; }
+    if (!services.length) { list.innerHTML = '<p class="empty-state">Услуги пока не добавлены в Google Таблицу.</p>'; return; }
     list.innerHTML = services.map((service, index) => {
       const price = safeText(service.price) ? escapeHtml(service.price) : "Уточняйте";
       const duration = safeText(service.duration);
