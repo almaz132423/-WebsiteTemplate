@@ -303,12 +303,6 @@
     const headers = (rows.shift() || []).map(value => value.trim().replace(/^\uFEFF/, ""));
     return rows.filter(values => values.some(value => value.trim() !== "")).map(values => Object.fromEntries(headers.map((header, index) => [header, (values[index] || "").trim()])));
   };
-  const fetchCsv = async (url) => {
-    if (typeof url !== "string" || !url.trim()) return [];
-    const response = await fetch(url + (url.includes("?") ? "&" : "?") + "_siteRefresh=" + Date.now(), { cache: "no-store" });
-    if (!response.ok) throw new Error("Не удалось загрузить опубликованную таблицу");
-    return parseCsv(await response.text());
-  };
   const applyLiveSettings = (config, rows) => {
     const targets = {
       "business.name":["business","name"], "business.type":["business","type"], "business.description":["business","description"],
@@ -329,13 +323,21 @@
     });
   };
   const loadLiveConfig = async (config) => {
-    const live = config.liveData || {}, tasks = [];
-    if (live.settingsCsvUrl) tasks.push(fetchCsv(live.settingsCsvUrl).then(rows => applyLiveSettings(config, rows)));
-    if (live.servicesCsvUrl) tasks.push(fetchCsv(live.servicesCsvUrl).then(rows => {
-      config.services = rows.map((row, index) => ({ id:row.id || "service-" + (index + 1), name:row.name || "", description:row.description || "", price:row.price || "", duration:row.duration || "", image:row.image || "", imageAlt:row.imageAlt || "" })).filter(service => service.name);
-    }));
-    const results = await Promise.allSettled(tasks);
-    results.forEach(result => { if (result.status === "rejected") console.warn("Live-таблица не загрузилась; используются данные из business.json.", result.reason); });
+    const url = config.liveData?.csvUrl;
+    if (!url) return config;
+    try {
+      const response = await fetch(url + (url.includes("?") ? "&" : "?") + "_siteRefresh=" + Date.now(), { cache: "no-store" });
+      if (!response.ok) throw new Error("Не удалось загрузить опубликованную таблицу");
+      const rows = parseCsv(await response.text());
+      applyLiveSettings(config, rows.filter(row => (row.type || "").toLowerCase() !== "service" && (row.key || row.field)));
+      const services = rows.filter(row => (row.type || "").toLowerCase() === "service" || (!row.key && row.name));
+      if (services.length) config.services = services.map((row, index) => ({
+        id: row.id || "service-" + (index + 1), name: row.name || "", description: row.description || "",
+        price: row.price || "", duration: row.duration || "", image: row.image || "", imageAlt: row.imageAlt || ""
+      })).filter(service => service.name);
+    } catch (error) {
+      console.warn("Live-таблица не загрузилась; используются данные из business.json.", error);
+    }
     return config;
   };
   const refreshLiveConfig = async () => {
