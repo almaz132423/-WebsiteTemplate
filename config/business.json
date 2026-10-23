@@ -118,7 +118,6 @@
     "messageTemplate": "Здравствуйте! Хочу оставить заявку в {{businessName}}.\nУслуга: {{serviceName}}\n{{fields}}"
   },
   "liveData": {
-    "settingsCsvUrl": "",
-    "servicesCsvUrl": ""
+    "csvUrl": ""
   }
 }
