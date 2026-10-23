@@ -5,6 +5,7 @@
   const AUTH_KEY = "businessTemplate.adminCredential.v1";
   const SESSION_KEY = "businessTemplate.adminUnlocked.v1";
   let config = null;
+  let editorInitialized = false;
 
   const authStatus = (message, isError = false) => {
     const node = $("#auth-status");
@@ -277,6 +278,19 @@
     }
   };
   const initEditor = async () => {
+    if (editorInitialized) {
+      try {
+        const response = await fetch("./config/business.json", { cache: "no-store" });
+        if (!response.ok) throw new Error("Не удалось загрузить config/business.json");
+        config = ensureShape(await response.json());
+        renderForm();
+        status("Конфигурация повторно загружена.");
+      } catch (error) {
+        status(error.message, true);
+      }
+      return;
+    }
+    editorInitialized = true;
     try {
       const response = await fetch("./config/business.json");
       if (!response.ok) throw new Error("Не удалось загрузить config/business.json");
