@@ -120,7 +120,7 @@
     setValue("messenger-telegram", config.messengers.telegram?.url);
     setValue("messenger-max", config.messengers.max?.url);
     setValue("sheets-csv-url", config.liveData?.csvUrl || "");
-    setValue("sheets-write-url", config.liveData?.writeUrl || "");
+    setValue("sheets-write-url", config.liveData?.writeUrl || localStorage.getItem("businessTemplate.sheetsWriteUrl") || "");
     renderServices();
     updatePreview();
   };
@@ -247,6 +247,7 @@
       config.liveData = config.liveData || {};
       config.liveData.csvUrl = getValue("sheets-csv-url");
       config.liveData.writeUrl = endpoint;
+      localStorage.setItem("businessTemplate.sheetsWriteUrl", endpoint);
       status("Запрос отправлен. Проверьте Google Таблицу: из-за ограничений браузера сайт не может прочитать ответ скрипта.");
     } catch (error) {
       status("Не удалось отправить данные: " + error.message, true);
