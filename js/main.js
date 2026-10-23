@@ -237,12 +237,10 @@
           catch (_) { showToast("Скопируйте текст сообщения вручную перед переходом."); }
           $("#messenger-instructions").textContent = "Текст скопирован, если браузер разрешил копирование. В открывшемся мессенджере вставьте сообщение и самостоятельно отправьте его.";
         }
-        const opened = window.open(latestUrl, "_blank", "noopener,noreferrer");
-        if (!opened) {
-          showToast("Браузер заблокировал новое окно. Разрешите открытие или скопируйте ссылку и сообщение вручную.");
-        } else {
-          showToast(key === "whatsapp" ? "Проверьте сообщение в WhatsApp и самостоятельно отправьте его." : "Вставьте подготовленный текст в мессенджере и отправьте его самостоятельно.");
-        }
+        const link = document.createElement("a");
+        link.href = latestUrl; link.target = "_blank"; link.rel = "noopener noreferrer";
+        document.body.append(link); link.click(); link.remove();
+        showToast(key === "whatsapp" ? "Проверьте сообщение в WhatsApp и самостоятельно отправьте его." : "Вставьте подготовленный текст в мессенджере и отправьте его самостоятельно.");
       });
       container.append(button);
     });
