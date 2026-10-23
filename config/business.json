@@ -1,0 +1,120 @@
+{
+  "business": {
+    "name": "Название компании",
+    "type": "Услуги для вас",
+    "description": "Кратко расскажите о компании, услугах и подходе к работе.",
+    "heroTitle": "Качество, которому можно доверять.",
+    "heroDescription": "Расскажите о своей компании, услугах и подходе к работе в конфигурации сайта.",
+    "heroNote": "Свяжитесь с нами, чтобы обсудить детали",
+    "heroImage": "",
+    "heroImageAlt": "Тематическое изображение компании",
+    "heroImageCaption": "Ваш бизнес. Ваш подход.",
+    "aboutTitle": "Внимание к деталям. Понятный подход.",
+    "aboutDescription": "Здесь разместите краткую и достоверную информацию о компании, опыте и принципах работы.",
+    "aboutPoints": [
+      "Опишите подтверждённое преимущество компании",
+      "Добавьте особенность обслуживания",
+      "Расскажите, чего ожидать клиенту"
+    ]
+  },
+  "contacts": {
+    "phone": "",
+    "address": "",
+    "hours": "",
+    "routeUrl": "",
+    "socials": []
+  },
+  "messengers": {
+    "whatsapp": {
+      "enabled": true,
+      "phone": ""
+    },
+    "telegram": {
+      "enabled": true,
+      "url": ""
+    },
+    "max": {
+      "enabled": true,
+      "url": ""
+    }
+  },
+  "theme": {
+    "background": "#f3f0e8",
+    "surface": "#fbfaf6",
+    "text": "#17211d",
+    "muted": "#68716b",
+    "accent": "#d6f36a",
+    "border": "#d8d8cd"
+  },
+  "seo": {
+    "title": "Название компании — услуги и контакты",
+    "description": "Информация об услугах компании и способах связи.",
+    "ogTitle": "Название компании",
+    "ogDescription": "Услуги и контакты компании",
+    "ogImage": ""
+  },
+  "services": [
+    {
+      "id": "service-1",
+      "name": "Название услуги",
+      "description": "Краткое описание услуги и результата для клиента.",
+      "price": "",
+      "duration": "",
+      "image": "",
+      "imageAlt": ""
+    },
+    {
+      "id": "service-2",
+      "name": "Название услуги",
+      "description": "Кратко опишите содержание услуги и важные детали.",
+      "price": "",
+      "duration": "",
+      "image": "",
+      "imageAlt": ""
+    },
+    {
+      "id": "service-3",
+      "name": "Название услуги",
+      "description": "Добавьте описание, понятное потенциальному клиенту.",
+      "price": "",
+      "duration": "",
+      "image": "",
+      "imageAlt": ""
+    }
+  ],
+  "booking": {
+    "title": "Заявка",
+    "intro": "Заполните форму, проверьте сообщение и выберите удобный мессенджер.",
+    "fields": [
+      {
+        "name": "name",
+        "label": "Ваше имя",
+        "type": "text",
+        "required": true,
+        "placeholder": "Как к вам обращаться?"
+      },
+      {
+        "name": "preferred_date",
+        "label": "Желаемая дата",
+        "type": "date",
+        "required": false,
+        "placeholder": ""
+      },
+      {
+        "name": "preferred_time",
+        "label": "Желаемое время",
+        "type": "time",
+        "required": false,
+        "placeholder": ""
+      },
+      {
+        "name": "comment",
+        "label": "Комментарий",
+        "type": "textarea",
+        "required": false,
+        "placeholder": "Дополнительная информация"
+      }
+    ],
+    "messageTemplate": "Здравствуйте! Хочу оставить заявку в {{businessName}}.\nУслуга: {{serviceName}}\n{{fields}}"
+  }
+}
