@@ -310,7 +310,7 @@
       "business.heroImage":["business","heroImage"], "business.heroImageAlt":["business","heroImageAlt"], "business.heroImageCaption":["business","heroImageCaption"],
       "business.aboutTitle":["business","aboutTitle"], "business.aboutDescription":["business","aboutDescription"],
       "contacts.phone":["contacts","phone"], "contacts.address":["contacts","address"], "contacts.hours":["contacts","hours"], "contacts.routeUrl":["contacts","routeUrl"],
-      "messengers.whatsapp.phone":["messengers","whatsapp","phone"], "messengers.telegram.url":["messengers","telegram","url"], "messengers.max.url":["messengers","max","url"],
+      "messengers.whatsapp.phone":["messengers","whatsapp","phone"], "messengers.whatsapp.enabled":["messengers","whatsapp","enabled"], "messengers.telegram.url":["messengers","telegram","url"], "messengers.telegram.enabled":["messengers","telegram","enabled"], "messengers.max.url":["messengers","max","url"], "messengers.max.enabled":["messengers","max","enabled"],
       "booking.intro":["booking","intro"], "seo.title":["seo","title"], "seo.description":["seo","description"], "seo.ogTitle":["seo","ogTitle"], "seo.ogDescription":["seo","ogDescription"]
     };
     rows.forEach(row => {
@@ -331,7 +331,7 @@
       const rows = parseCsv(await response.text());
       applyLiveSettings(config, rows.filter(row => (row.type || "").toLowerCase() !== "service" && (row.key || row.field)));
       const services = rows.filter(row => (row.type || "").toLowerCase() === "service" || (!row.key && row.name));
-      if (services.length) config.services = services.map((row, index) => ({
+      config.services = services.map((row, index) => ({
         id: row.id || "service-" + (index + 1), name: row.name || "", description: row.description || "",
         price: row.price || "", duration: row.duration || "", image: row.image || "", imageAlt: row.imageAlt || ""
       })).filter(service => service.name);
