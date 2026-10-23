@@ -30,8 +30,8 @@
   <div id="admin-app" hidden>
   <header class="site-header"><div class="container header-inner"><a class="brand" href="./index.html"><span class="brand-mark" aria-hidden="true">●</span>Редактор конфигурации</a><div class="admin-header-actions"><button class="button button-small button-outline" id="logout-admin" type="button">Выйти</button><a class="button button-small" href="./index.html">Открыть сайт ↗</a></div></div></header>
   <main class="container admin-main">
-    <div class="admin-heading"><p class="eyebrow"><span class="eyebrow-line"></span>ЛОКАЛЬНЫЙ ИНСТРУМЕНТ</p><h1>Данные <em>компании.</em></h1><p>Редактируйте контакты и каталог услуг, затем экспортируйте JSON и замените файл <code>config/business.json</code> в проекте.</p></div>
-    <div class="admin-warning" role="note"><strong>Важно.</strong> Это локальный редактор файла конфигурации, а не защищённая административная панель. Изменения сохраняются в браузере до экспорта; сайт не обновится автоматически, пока вы не замените конфигурационный файл в проекте.</div>
+    <div class="admin-heading"><p class="eyebrow"><span class="eyebrow-line"></span>РЕДАКТОР ДАННЫХ</p><h1>Данные <em>компании.</em></h1><p>Для изменения цен и услуг без повторной публикации используйте подключённые Google Таблицы. Сайт автоматически загружает оттуда актуальные данные.</p></div>
+    <div class="admin-warning" role="note"><strong>Важно:</strong> этот локальный редактор сам по себе не записывает изменения на сайт. После первоначального подключения Google Таблиц меняйте данные прямо в таблице — JSON заменять не нужно.</div>
     <section class="admin-panel"><div class="admin-panel-heading"><h2>Компания и контакты</h2></div><div class="admin-fields">
       <label>Название компании<input id="business-name" type="text"></label>
       <label>Направление бизнеса<input id="business-type" type="text"></label>
