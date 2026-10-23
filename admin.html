@@ -31,7 +31,20 @@
   <header class="site-header"><div class="container header-inner"><a class="brand" href="./index.html"><span class="brand-mark" aria-hidden="true">●</span>Редактор конфигурации</a><div class="admin-header-actions"><button class="button button-small button-outline" id="logout-admin" type="button">Выйти</button><a class="button button-small" href="./index.html">Открыть сайт ↗</a></div></div></header>
   <main class="container admin-main">
     <div class="admin-heading"><p class="eyebrow"><span class="eyebrow-line"></span>РЕДАКТОР ДАННЫХ</p><h1>Данные <em>компании.</em></h1><p>Для изменения цен и услуг без повторной публикации используйте подключённые Google Таблицы. Сайт автоматически загружает оттуда актуальные данные.</p></div>
-    <div class="admin-warning" role="note"><strong>Важно:</strong> этот локальный редактор сам по себе не записывает изменения на сайт. После первоначального подключения Google Таблиц меняйте данные прямо в таблице — JSON заменять не нужно.</div>
+    <div class="admin-warning" role="note"><strong>Важно:</strong> локальный пароль защищает только интерфейс в этом браузере. Для сохранения из редактора подключите Google Apps Script и задайте секретный токен в настройках скрипта. Не публикуйте токен в репозитории.</div>
+    <section class="admin-panel" aria-labelledby="sheets-heading">
+      <div class="admin-panel-heading"><h2 id="sheets-heading">Сохранение в Google Таблицу</h2></div>
+      <div class="admin-fields">
+        <label class="wide">CSV-ссылка для чтения сайтом<input id="sheets-csv-url" type="url" placeholder="https://docs.google.com/spreadsheets/d/.../export?format=csv&gid=0"></label>
+        <label class="wide">URL веб-приложения Google Apps Script<input id="sheets-write-url" type="url" placeholder="https://script.google.com/macros/s/.../exec"></label>
+        <label class="wide">Секретный токен администратора<input id="sheets-admin-token" type="password" autocomplete="off" placeholder="Токен из Script Properties; не сохраняется в JSON"></label>
+      </div>
+      <div class="admin-actions" style="margin-top:16px">
+        <button class="button" id="save-to-sheets" type="button">Сохранить изменения в Google Таблицу</button>
+        <a class="button button-outline" id="open-google-sheet" href="https://docs.google.com/spreadsheets/d/11X-a1AUTlxjV5ZgwIR5PXFiyhsXRgELHqZUlDaSzQc4/edit" target="_blank" rel="noopener noreferrer">Открыть таблицу ↗</a>
+      </div>
+      <p class="admin-help">После нажатия редактор отправит текущие данные в скрипт Google. Из-за ограничений браузера результат нужно подтвердить в самой таблице. Токен хранится только в памяти открытой страницы.</p>
+    </section>
     <section class="admin-panel"><div class="admin-panel-heading"><h2>Компания и контакты</h2></div><div class="admin-fields">
       <label>Название компании<input id="business-name" type="text"></label>
       <label>Направление бизнеса<input id="business-type" type="text"></label>
