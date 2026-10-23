@@ -11,6 +11,23 @@
   <script src="./js/admin.js" defer></script>
 </head>
 <body class="admin-page">
+  <main id="auth-screen" class="auth-screen" aria-labelledby="auth-title">
+    <form id="auth-form" class="auth-card">
+      <p class="eyebrow"><span class="eyebrow-line"></span>ЛОКАЛЬНЫЙ ДОСТУП</p>
+      <h1 id="auth-title">Вход в <em>редактор.</em></h1>
+      <p id="auth-description">Задайте пароль для этого браузера. Он будет сохранён локально.</p>
+      <label id="auth-password-label" for="auth-password">Пароль
+        <input id="auth-password" type="password" autocomplete="current-password" minlength="8" required>
+      </label>
+      <label id="auth-confirm-label" for="auth-confirm" hidden>Повторите пароль
+        <input id="auth-confirm" type="password" autocomplete="new-password" minlength="8">
+      </label>
+      <button class="button" type="submit" id="auth-submit">Войти</button>
+      <p id="auth-status" class="admin-status" role="status" aria-live="polite"></p>
+      <p class="auth-note">Это базовый локальный барьер, а не серверная защита. Не используйте его для хранения чувствительных данных.</p>
+    </form>
+  </main>
+  <div id="admin-app" hidden>
   <header class="site-header"><div class="container header-inner"><a class="brand" href="./index.html"><span class="brand-mark" aria-hidden="true">●</span>Редактор конфигурации</a><a class="button button-small" href="./index.html">Открыть сайт ↗</a></div></header>
   <main class="container admin-main">
     <div class="admin-heading"><p class="eyebrow"><span class="eyebrow-line"></span>ЛОКАЛЬНЫЙ ИНСТРУМЕНТ</p><h1>Данные <em>компании.</em></h1><p>Редактируйте контакты и каталог услуг, затем экспортируйте JSON и замените файл <code>config/business.json</code> в проекте.</p></div>
@@ -36,5 +53,6 @@
     <section class="admin-panel"><div class="admin-panel-heading"><h2>Конфигурация JSON</h2></div><div class="admin-actions"><button class="button" id="export-config" type="button">Экспорт JSON ↓</button><label class="button button-outline import-button" for="import-config">Импорт JSON ↑</label><input id="import-config" type="file" accept="application/json,.json" hidden><button class="button button-outline" id="download-current" type="button">Скачать текущую конфигурацию</button></div><p class="admin-status" id="admin-status" role="status" aria-live="polite"></p><details><summary>Просмотр JSON</summary><pre id="json-preview"></pre></details></section>
     <div class="admin-footer"><a href="./index.html">← Вернуться на сайт</a><span>После экспорта замените config/business.json в проекте.</span></div>
   </main>
+  </div>
 </body>
 </html>
