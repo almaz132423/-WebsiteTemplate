@@ -1,8 +1,94 @@
-(() => {
+( () => {
   "use strict";
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+  const AUTH_KEY = "businessTemplate.adminCredential.v1";
+  const SESSION_KEY = "businessTemplate.adminUnlocked.v1";
   let config = null;
+
+  const authStatus = (message, isError = false) => {
+    const node = $("#auth-status");
+    node.textContent = message;
+    node.classList.toggle("is-error", isError);
+  };
+  const hashPassword = async (password, salt) => {
+    if (!globalThis.crypto?.subtle) {
+      throw new Error("Криптографический API недоступен. Откройте страницу по HTTPS или через localhost.");
+    }
+    const bytes = new TextEncoder().encode(salt + ":" + password);
+    const digest = await crypto.subtle.digest("SHA-256", bytes);
+    return [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, "0")).join("");
+  };
+  const randomSalt = () => {
+    const bytes = crypto.getRandomValues(new Uint8Array(16));
+    return [...bytes].map(byte => byte.toString(16).padStart(2, "0")).join("");
+  };
+  const showAuthMode = () => {
+    const configured = Boolean(localStorage.getItem(AUTH_KEY));
+    $("#auth-title").innerHTML = configured ? "Вход в <em>редактор.</em>" : "Задайте <em>пароль.</em>";
+    $("#auth-description").textContent = configured
+      ? "Введите пароль, сохранённый для этого браузера."
+      : "Создайте пароль длиной не менее 8 символов. Он будет храниться локально в этом браузере.";
+    $("#auth-confirm-label").hidden = configured;
+    $("#auth-confirm").required = !configured;
+    $("#auth-password").autocomplete = configured ? "current-password" : "new-password";
+    $("#auth-submit").textContent = configured ? "Войти" : "Создать пароль";
+  };
+  const unlockAdmin = () => {
+    sessionStorage.setItem(SESSION_KEY, "1");
+    $("#auth-screen").hidden = true;
+    $("#admin-app").hidden = false;
+    initEditor();
+  };
+  const initAuth = () => {
+    $("#auth-form").addEventListener("submit", async event => {
+      event.preventDefault();
+      const password = $("#auth-password").value;
+      const confirm = $("#auth-confirm").value;
+      if (password.length < 8) {
+        authStatus("Пароль должен содержать не менее 8 символов.", true);
+        return;
+      }
+      try {
+        const saved = localStorage.getItem(AUTH_KEY);
+        if (!saved) {
+          if (password !== confirm) {
+            authStatus("Пароли не совпадают.", true);
+            return;
+          }
+          const salt = randomSalt();
+          const hash = await hashPassword(password, salt);
+          localStorage.setItem(AUTH_KEY, JSON.stringify({ salt, hash }));
+          authStatus("Пароль создан. Редактор открыт.");
+          unlockAdmin();
+          return;
+        }
+        const credential = JSON.parse(saved);
+        const hash = await hashPassword(password, credential.salt);
+        if (hash !== credential.hash) {
+          authStatus("Неверный пароль.", true);
+          $("#auth-password").select();
+          return;
+        }
+        authStatus("Вход выполнен.");
+        unlockAdmin();
+      } catch (error) {
+        authStatus(error.message || "Не удалось выполнить вход.", true);
+      }
+    });
+    $("#logout-admin").addEventListener("click", () => {
+      sessionStorage.removeItem(SESSION_KEY);
+      $("#admin-app").hidden = true;
+      $("#auth-screen").hidden = false;
+      $("#auth-form").reset();
+      showAuthMode();
+      authStatus("Вы вышли из редактора.");
+      $("#auth-password").focus();
+    });
+    showAuthMode();
+    if (sessionStorage.getItem(SESSION_KEY) === "1") unlockAdmin();
+  };
+
   const status = (message, isError = false) => {
     const node = $("#admin-status");
     node.textContent = message;
@@ -39,16 +125,31 @@
     const container = $("#services-editor");
     container.replaceChildren();
     if (!config.services.length) {
-      const empty = document.createElement("p"); empty.className = "admin-help"; empty.textContent = "Услуг пока нет. Нажмите «Добавить услугу»."; container.append(empty);
+      const empty = document.createElement("p");
+      empty.className = "admin-help";
+      empty.textContent = "Услуг пока нет. Нажмите «Добавить услугу».";
+      container.append(empty);
     }
     config.services.forEach((service, index) => {
-      const card = document.createElement("article"); card.className = "service-editor-card";
-      const top = document.createElement("div"); top.className = "service-editor-top";
-      const heading = document.createElement("strong"); heading.textContent = "Услуга " + String(index + 1).padStart(2, "0");
-      const remove = document.createElement("button"); remove.type = "button"; remove.className = "delete-service"; remove.textContent = "Удалить";
-      remove.addEventListener("click", () => { config.services.splice(index, 1); renderServices(); updatePreview(); status("Услуга удалена из текущего черновика. Экспортируйте JSON, чтобы сохранить изменения."); });
+      const card = document.createElement("article");
+      card.className = "service-editor-card";
+      const top = document.createElement("div");
+      top.className = "service-editor-top";
+      const heading = document.createElement("strong");
+      heading.textContent = "Услуга " + String(index + 1).padStart(2, "0");
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.className = "delete-service";
+      remove.textContent = "Удалить";
+      remove.addEventListener("click", () => {
+        config.services.splice(index, 1);
+        renderServices();
+        updatePreview();
+        status("Услуга удалена из текущего черновика. Экспортируйте JSON, чтобы сохранить изменения.");
+      });
       top.append(heading, remove);
-      const fields = document.createElement("div"); fields.className = "service-editor-fields";
+      const fields = document.createElement("div");
+      fields.className = "service-editor-fields";
       const name = makeInput("Название услуги", service.name, false);
       const description = makeInput("Описание", service.description, true);
       const price = makeInput("Цена или пометка «Уточняйте»", service.price, false);
@@ -57,12 +158,15 @@
       [[name, "name"], [description, "description"], [price, "price"], [duration, "duration"]].forEach(([item, key]) => {
         item.control.addEventListener("input", () => {
           config.services[index][key] = item.control.value;
-          if (key === "name") heading.textContent = item.control.value.trim() ? "Услуга " + String(index + 1).padStart(2, "0") + " — " + item.control.value.trim() : "Услуга " + String(index + 1).padStart(2, "0");
+          if (key === "name") heading.textContent = item.control.value.trim()
+            ? "Услуга " + String(index + 1).padStart(2, "0") + " — " + item.control.value.trim()
+            : "Услуга " + String(index + 1).padStart(2, "0");
           updatePreview();
         });
         fields.append(item.wrapper);
       });
-      card.append(top, fields); container.append(card);
+      card.append(top, fields);
+      container.append(card);
     });
   };
   const makeInput = (labelText, value, textarea) => {
@@ -102,11 +206,16 @@
     updatePreview();
     const blob = new Blob([JSON.stringify(config, null, 2) + "\n"], { type: "application/json;charset=utf-8" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a"); a.href = url; a.download = "business.json"; document.body.append(a); a.click(); a.remove();
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "business.json";
+    document.body.append(a);
+    a.click();
+    a.remove();
     URL.revokeObjectURL(url);
     status("Конфигурация экспортирована. Замените config/business.json в проекте.");
   };
-  const loadFile = async (file) => {
+  const loadFile = async file => {
     try {
       const parsed = JSON.parse(await file.text());
       config = ensureShape(parsed);
@@ -116,7 +225,7 @@
       status("Не удалось импортировать JSON: " + error.message, true);
     }
   };
-  const init = async () => {
+  const initEditor = async () => {
     try {
       const response = await fetch("./config/business.json");
       if (!response.ok) throw new Error("Не удалось загрузить config/business.json");
@@ -128,19 +237,22 @@
       status(error.message + ". Запустите сайт через локальный веб-сервер или импортируйте JSON-файл.", true);
       config = { business: {}, contacts: {}, messengers: {}, services: [], booking: { fields: [] } };
     }
+    $("#add-service").addEventListener("click", () => {
+      if (!config) return;
+      config.services.push({ id: "service-" + Date.now(), name: "", description: "", price: "", duration: "", image: "", imageAlt: "" });
+      renderServices();
+      updatePreview();
+      status("Добавлена новая услуга. Заполните поля и экспортируйте JSON.");
+    });
+    $("#export-config").addEventListener("click", exportConfig);
+    $("#download-current").addEventListener("click", exportConfig);
+    $("#import-config").addEventListener("change", event => {
+      const file = event.target.files?.[0];
+      if (file) loadFile(file);
+      event.target.value = "";
+    });
+    $$(".admin-fields input, .admin-fields textarea").forEach(control => control.addEventListener("input", updatePreview));
   };
-  $("#add-service").addEventListener("click", () => {
-    if (!config) return;
-    config.services.push({ id: "service-" + Date.now(), name: "", description: "", price: "", duration: "", image: "", imageAlt: "" });
-    renderServices(); updatePreview(); status("Добавлена новая услуга. Заполните поля и экспортируйте JSON.");
-  });
-  $("#export-config").addEventListener("click", exportConfig);
-  $("#download-current").addEventListener("click", exportConfig);
-  $("#import-config").addEventListener("change", event => {
-    const file = event.target.files?.[0];
-    if (file) loadFile(file);
-    event.target.value = "";
-  });
-  $$(".admin-fields input, .admin-fields textarea").forEach(control => control.addEventListener("input", updatePreview));
-  init();
+
+  initAuth();
 })();
