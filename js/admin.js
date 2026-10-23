@@ -1,6 +1,7 @@
 (() => {
   "use strict";
   const $ = (selector, root = document) => root.querySelector(selector);
+  const $ = (selector, root = document) => [...root.querySelectorAll(selector)];
   let config = null;
   const status = (message, isError = false) => {
     const node = $("#admin-status");
