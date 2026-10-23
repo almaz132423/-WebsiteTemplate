@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#17211d">
+  <title>Редактор конфигурации — шаблон сайта</title>
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/admin.css">
+  <script src="./js/admin.js" defer></script>
+</head>
+<body class="admin-page">
+  <header class="site-header"><div class="container header-inner"><a class="brand" href="./index.html"><span class="brand-mark" aria-hidden="true">●</span>Редактор конфигурации</a><a class="button button-small" href="./index.html">Открыть сайт ↗</a></div></header>
+  <main class="container admin-main">
+    <div class="admin-heading"><p class="eyebrow"><span class="eyebrow-line"></span>ЛОКАЛЬНЫЙ ИНСТРУМЕНТ</p><h1>Данные <em>компании.</em></h1><p>Редактируйте контакты и каталог услуг, затем экспортируйте JSON и замените файл <code>config/business.json</code> в проекте.</p></div>
+    <div class="admin-warning" role="note"><strong>Важно.</strong> Это локальный редактор файла конфигурации, а не защищённая административная панель. Изменения сохраняются в браузере до экспорта; сайт не обновится автоматически, пока вы не замените конфигурационный файл в проекте.</div>
+    <section class="admin-panel"><div class="admin-panel-heading"><h2>Компания и контакты</h2></div><div class="admin-fields">
+      <label>Название компании<input id="business-name" type="text"></label>
+      <label>Направление бизнеса<input id="business-type" type="text"></label>
+      <label>Телефон<input id="contact-phone" type="tel"></label>
+      <label>Адрес<input id="contact-address" type="text"></label>
+      <label>Часы работы<input id="contact-hours" type="text"></label>
+      <label>Ссылка на маршрут<input id="contact-route" type="url" placeholder="https://…"></label>
+      <label class="wide">Описание компании<textarea id="business-description" rows="3"></textarea></label>
+      <label class="wide">Заголовок первого экрана<input id="business-hero-title" type="text"></label>
+      <label class="wide">Описание первого экрана<textarea id="business-hero-description" rows="3"></textarea></label>
+      <label class="wide">Ссылка на изображение первого экрана<input id="business-hero-image" type="url" placeholder="https://… или относительный путь"></label>
+    </div></section>
+    <section class="admin-panel"><div class="admin-panel-heading"><h2>Услуги</h2><button class="button button-small" id="add-service" type="button">Добавить услугу +</button></div><div id="services-editor" class="services-editor"></div></section>
+    <section class="admin-panel"><div class="admin-panel-heading"><h2>Мессенджеры</h2></div><div class="admin-fields">
+      <label>WhatsApp — номер с кодом страны<input id="messenger-whatsapp" type="tel" placeholder="Например, код страны и номер"></label>
+      <label>Telegram — ссылка на чат/профиль<input id="messenger-telegram" type="url" placeholder="https://t.me/…"></label>
+      <label class="wide">MAX — ссылка на чат/профиль<input id="messenger-max" type="url" placeholder="Подтверждённая ссылка https://…"></label>
+    </div><p class="admin-help">Для Telegram и MAX шаблон открывает указанную ссылку и копирует текст заявки, когда браузер это разрешает. Автоматическая отправка в конкретный чат не предполагается.</p></section>
+    <section class="admin-panel"><div class="admin-panel-heading"><h2>Конфигурация JSON</h2></div><div class="admin-actions"><button class="button" id="export-config" type="button">Экспорт JSON ↓</button><label class="button button-outline import-button" for="import-config">Импорт JSON ↑</label><input id="import-config" type="file" accept="application/json,.json" hidden><button class="button button-outline" id="download-current" type="button">Скачать текущую конфигурацию</button></div><p class="admin-status" id="admin-status" role="status" aria-live="polite"></p><details><summary>Просмотр JSON</summary><pre id="json-preview"></pre></details></section>
+    <div class="admin-footer"><a href="./index.html">← Вернуться на сайт</a><span>После экспорта замените config/business.json в проекте.</span></div>
+  </main>
+</body>
+</html>
